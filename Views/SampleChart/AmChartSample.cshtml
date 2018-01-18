@@ -1,0 +1,145 @@
+﻿
+@{
+    ViewBag.Title = "AmChartSample";
+}
+
+<!--amchart Resoureces-->
+<script src="~/Content/amcharts/amcharts.js"></script>
+<script src="~/Content/amcharts/serial.js"></script>
+<script src="~/Content/amcharts/plugins/export/export.min.js"></script>
+<link href="~/Content/amcharts/plugins/export/export.css" rel="stylesheet" />
+<script src="~/Content/amcharts/themes/light.js"></script>
+<!--amchart Resoureces Ends Here-->
+<p></p>
+<div class="row">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <h4 class="panel-title">&nbsp;Sample Chart</h4>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="chartdiv" style="height:500px;width:100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <!-- CUSTOM JS -->
+  <script>
+     function LoadVisualAjax() {
+        return $.ajax({
+            type: "Get",
+            url: '@Url.Action("GetChartData", "SampleChart")',
+        });
+      }
+    function LoadVisual() {
+        $.when(LoadVisualAjax()).then((data) => {
+            DrawChart(data);
+        }).fail(() => {
+           alert ("Fail to initialize Chart");
+        });
+      }
+
+   function DrawChart(dataVal) {
+     
+       var chart = AmCharts.makeChart("chartdiv", {
+                "type": "serial",
+                "theme": "light",
+                "marginRight": 40,
+                "marginLeft": 40,
+                "autoMarginOffset": 20,
+                "mouseWheelZoomEnabled": true,
+                "dataDateFormat": "YYYY-MM-DD",
+                "valueAxes": [{
+                    "id": "v1",
+                    "axisAlpha": 0,
+                    "position": "left",
+                    "ignoreAxisWidth": true,
+                    "title": "Yield",
+                    "position": "left",
+                    "autoGridCount": false,
+                    "labelFunction": function (value) {
+                        return Math.round(value);
+                    }
+                }],
+
+                "balloon": {
+                    "borderThickness": 1,
+                    "shadowAlpha": 0,
+                },
+                "graphs": [{
+                    "id": "g1",
+                    "bullet": "round",
+                    "bulletBorderAlpha": 1,
+                    "bulletColor": "#FFFFFF",
+                    "bulletSize": 5,
+                    "hideBulletsCount": 50,
+                    "lineThickness": 2,
+                    "title": "Effective Yield ",
+                    "useLineColorForBulletBorder": true,
+                    "valueField": "EffectiveYield",
+                    "balloonText": "[[category]]: <b style='font-size: 130%'>[[value]]</b>",
+                }],
+                "chartScrollbar": {
+                    "graph": "g1",
+                    "oppositeAxis": false,
+                    "offset": 30,
+                    "scrollbarHeight": 80,
+                    "backgroundAlpha": 0,
+                    "selectedBackgroundAlpha": 0.1,
+                    "selectedBackgroundColor": "#888888",
+                    "graphFillAlpha": 0,
+                    "graphLineAlpha": 0.5,
+                    "selectedGraphFillAlpha": 0,
+                    "selectedGraphLineAlpha": 1,
+                    "autoGridCount": true,
+                    "color": "#AAAAAA"
+                },
+                "chartCursor": {
+                    "pan": true,
+                    "valueLineEnabled": true,
+                    "valueLineBalloonEnabled": true,
+                    "cursorAlpha": 1,
+                    "cursorColor": "#258cbb",
+                    "limitToGraph": "g1",
+                    "valueLineAlpha": 0.4,
+                    "valueZoomable": true
+                },
+                "valueScrollbar": {
+                    "oppositeAxis": false,
+                    "offset": 50,
+                    "scrollbarHeight": 10
+                },
+                "categoryField": "Date",
+                "categoryAxis": {
+                    "parseDates": true,
+                    "equalSpacing": true,
+                    "minPeriod": "DD",
+                    "dashLength": 1,
+                    "minorGridEnabled": true,
+                },
+
+                "legend": {
+                    "useGraphSettings": true,
+                    "position": "top"
+                },
+                "export": {
+                    "enabled": false,
+                },
+                "dataProvider": dataVal
+
+            });
+       chart.addListener("rendered");
+      }
+
+      $(document).ready(function () {
+          LoadVisual();
+      });
+ </script>
+ 
+}
